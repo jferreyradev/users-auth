@@ -1,6 +1,13 @@
 <script setup>
 import { ref } from 'vue'
 import { useUserStore } from '@/stores/user.js'
+import { useFetch } from '@/composables/useFetch'
+
+function useLiq(getId) {
+  return useFetch(() => `${store.URL_API}/view/liq?${getId()}&sort={"Orden":"asc"}`)
+}
+
+const { data, error, isPending } = useLiq(() => store.filterString)
 
 const email = ref('')
 const password = ref('')
@@ -25,7 +32,10 @@ console.log(user.currentUser)
           <v-card-title class="text-center">Registro de usuario</v-card-title>
           <v-card-text>
             <v-form @submit.prevent="signUp">
-              <v-text-field v-model="dni" label="DNI" outlined required></v-text-field>
+              <div>
+                <v-text-field v-model="dni" label="DNI" outlined required></v-text-field>
+                <v-btn color="primary" block class="mb-10">Verificar DNI</v-btn>
+              </div>
               <v-text-field
                 v-model="email"
                 label="Correo electrónico"
