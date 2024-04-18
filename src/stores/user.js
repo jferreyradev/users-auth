@@ -1,15 +1,26 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
-
 import { auth } from '../firebase'
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "firebase/auth";
+import { useFetch } from '@/composables/useFetch.js'
+//import { useFilterStore } from '@/stores/filterStore.js'
+
+//const store = useFilterStore()
 
 export const useUserStore = defineStore('user', () => {
     const currentUser = ref('')
-    //const password = ref('')
-    //const dni = ref('')
-    //const name = ref('Eduardo')
-    //const doubleCount = computed(() => count.value * 2)
+    const pers = ref({})
+
+    async function setPers(dni) {
+        const { data, error, isPending } = useFetch(() => `https://midliq-api-jr2sc3ef7gnx.deno.dev/api/view/personaLista?Documento=${dni}`)
+        if (data) {
+            pers.value = {
+                'dni': data.DOCUMENTO,
+                'Apellido': data.APELLIDO,
+                'Nombre': data.NOMBRE
+            }
+        }
+    }
 
     async function newUser(dni, email, password) {
         try {
@@ -51,5 +62,5 @@ export const useUserStore = defineStore('user', () => {
         });
     }
 
-    return { login, logout, newUser, currentUser }
+    return { login, logout, newUser, currentUser, pers, setPers }
 })
