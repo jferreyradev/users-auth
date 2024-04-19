@@ -11,16 +11,31 @@ export const useLiqStore = defineStore('liq', () => {
     const URL_API = 'http://www.serverconcepcion.duckdns.org:3007/api'
 
     const dni = ref('')
+    const data = ref('')
+    const error = ref('')
+    const isPending = ref('')
 
     function getLiq() {
         return useFetch(() => `${URL_API}/view/boletas?Documento=${dni.value}`)
     }
+
     function setPers(val) {
-        console.log(val)
+        console.log("obteniedo datos de " + val)
         dni.value = val
+        isPending.value = true
+        console.log(`${URL_API}/view/boletas?Documento=${dni.value}`)
+        fetch(`${URL_API}/view/boletas?Documento=${dni.value}`)
+            .then((res) => res.json())
+            .then((_data) => {
+                data.value = _data
+                //this.month = _data[0].PERIODO.split('-')[1]
+            })
+            .catch((err) => {
+                console.log(err)
+                error.value = err
+            })
+            .finally(() => isPending.value = false)
     }
 
-    const { data, error, isPending } = getLiq(dni)
-
-    return { data, error, isPending, setPers }
+    return { data, error, isPending, setPers, dni, URL_API }
 })

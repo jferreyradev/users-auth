@@ -1,13 +1,15 @@
 <script setup>
 import LiqBoletasPers from '@/components/LiqBoletasPers.vue'
 import { ref } from 'vue'
-import { useUserStore } from '@/stores/user.js'
+import { useLiqStore } from '@/stores/liqStore.js'
 
 const dni = ref('')
-const store = useUserStore()
+const store = useLiqStore()
 
 function handleClick() {
-  store.setPers(dni.value)
+  console.log(dni.value)
+  //store.setPers(dni.value)
+  store.dni = dni.value
 }
 </script>
 

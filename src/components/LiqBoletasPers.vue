@@ -1,17 +1,20 @@
 <script setup>
-//import { ref } from 'vue'
 //import { useFilterStore } from '@/stores/filterStore.js'
 import { useFetch } from '@/composables/useFetch.js'
 import RepoHeader from './RepoHeader.vue'
-import { useUserStore } from '@/stores/user.js'
+import { useLiqStore } from '@/stores/liqStore'
 
-const store = useUserStore()
+/*const store = useUserStore()
+
+*/
+
+const store = useLiqStore()
 
 function useBoletasLiq(getId) {
   return useFetch(() => `${store.URL_API}/view/boletas?Documento=${getId()}`)
 }
 
-const { data, error, isPending } = useBoletasLiq(() => store.pers.DOCUMENTO)
+const { data, error, isPending } = useBoletasLiq(() => store.dni)
 
 const getVto = (vto) => {
   if (vto) {
@@ -25,6 +28,7 @@ const headers = [
   { key: 'TIPOLIQUIDACIONDESCRIPCION', title: 'Liquidación' },
   { key: 'PERIODO', title: 'Emisión' },
   { key: 'FECHADEV', title: 'Devengado' },
+  { key: 'NETO', title: 'Neto' },
   { key: 'LIQUIDACIONID', title: 'link descarga' }
 ]
 </script>
@@ -32,6 +36,7 @@ const headers = [
 <template>
   <v-container>
     <RepoHeader
+      v-if="data"
       title="Boletas disponibles para descarga"
       :subtitle="' DNI:' + data[0].DOCUMENTO + ' ' + data[0].APELLIDO + ' ' + data[0].NOMBRE"
     >
