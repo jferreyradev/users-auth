@@ -1,29 +1,23 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
-import { auth } from '../firebase'
+import { auth, db } from '../firebase'
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "firebase/auth";
-import { useFetch } from '@/composables/useFetch.js'
-//import { useFilterStore } from '@/stores/filterStore.js'
+import { collection, query, where, getDocs } from "firebase/firestore";
+import { useConn } from '@/composables/conn';
+import { useFetch } from '@/composables/fetch';
 
-//const store = useFilterStore()
+
 
 export const useUserStore = defineStore('user', () => {
     const currentUser = ref('')
-    const pers = ref({})
+    const dni = ref('')
+    const apenom = ref('')
+    const nivel = ref(0)
+    const conn = useConn()
 
-    async function setPers(dni) {
-        const { data, error, isPending } = useFetch(() => `https://midliq-api-jr2sc3ef7gnx.deno.dev/api/view/personaLista?Documento=${dni}`)
-        if (data) {
-            pers.value = {
-                'dni': data.DOCUMENTO,
-                'Apellido': data.APELLIDO,
-                'Nombre': data.NOMBRE
-            }
-        }
-    }
-
-    async function newUser(dni, email, password) {
+    async function newUser(email, password) {
         try {
+
             await createUserWithEmailAndPassword(auth, email, password)
         } catch (error) {
             switch (error.code) {
@@ -62,5 +56,41 @@ export const useUserStore = defineStore('user', () => {
         });
     }
 
-    return { login, logout, newUser, currentUser, pers, setPers }
+    async function verifyDNI(dni) {
+        console.log('verificando ', dni)
+
+        try {
+            const docRef = collection(db, "usersliq");
+
+            // Create a query against the collection.
+            const q = query(docRef, where("doc", "==", dni));
+            const querySnapshot = await getDocs(q);
+            if (querySnapshot.size > 0) {
+                querySnapshot.forEach((doc) => {
+                    // doc.data() is never undefined for query doc snapshots
+                    //console.log(doc.id, " => ", doc.data().doc);
+                    console.log('dni ', doc.data().doc);
+                    console.log('nivel ', doc.data().nivel);
+                });
+            }
+
+        } catch (error) {
+            console.error('Error al iniciar sesión:', error.message)
+        }
+    }
+
+    async function existDNI(dni) {
+        console.log('verificando en ora ', dni)
+
+        console.log(`fetching ${conn.baseUrl}/view/personaLista?Documento=${dni}`)
+
+        const { data, error } = useFetch(() => `${conn.baseUrl}/view/personaLista?Documento=${dni}`)
+        if (error)
+            console.log(error)
+        else
+            console.log(data)
+    }
+
+
+    return { login, logout, newUser, currentUser, verifyDNI, existDNI }
 })

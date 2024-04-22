@@ -2,13 +2,11 @@ import { ref } from 'vue'
 import { defineStore } from 'pinia'
 import { useFetch } from '@/composables/useFetch';
 
-
 //const URL_API= 'https://midliq-api-jr2sc3ef7gnx.deno.dev/api'
-
 
 export const useLiqStore = defineStore('liq', () => {
 
-    const URL_API = 'http://www.serverconcepcion.duckdns.org:3007/api'
+    const URL_API = 'http://www.serverburru2.duckdns.org:3005/api'
 
     const dni = ref('')
     const data = ref('')
