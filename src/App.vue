@@ -1,8 +1,8 @@
 <script setup>
 import { RouterLink, RouterView } from 'vue-router'
-import { useConn } from '@/composables/conn.js'
+//import { useConn } from '@/composables/conn.js'
 
-useConn('http://www.serverburru2.duckdns.org:3005/api')
+//useConn('http://www.serverburru2.duckdns.org:3005/api')
 </script>
 
 <template>

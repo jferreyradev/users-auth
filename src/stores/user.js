@@ -10,14 +10,12 @@ import { useFetch } from '@/composables/fetch';
 
 export const useUserStore = defineStore('user', () => {
     const currentUser = ref('')
-    const dni = ref('')
-    const apenom = ref('')
+    const pers = ref('')
     const nivel = ref(0)
     const conn = useConn()
 
     async function newUser(email, password) {
         try {
-
             await createUserWithEmailAndPassword(auth, email, password)
         } catch (error) {
             switch (error.code) {
@@ -33,6 +31,7 @@ export const useUserStore = defineStore('user', () => {
             return
         }
         currentUser.value = auth.currentUser
+        console.log(currentUser.value)
     }
 
     async function login(email, password) {
@@ -82,15 +81,14 @@ export const useUserStore = defineStore('user', () => {
     async function existDNI(dni) {
         console.log('verificando en ora ', dni)
 
-        console.log(`fetching ${conn.baseUrl}/view/personaLista?Documento=${dni}`)
-
-        const { data, error } = useFetch(() => `${conn.baseUrl}/view/personaLista?Documento=${dni}`)
-        if (error)
-            console.log(error)
-        else
+        try {
+            const res = await fetch(`http://www.serverburru2.duckdns.org:3005/api/view/personaLista?Documento=${dni}`)
+            const data = res.json()
             console.log(data)
+        } catch (error) {
+            console.log(error);
+        }
     }
 
-
-    return { login, logout, newUser, currentUser, verifyDNI, existDNI }
+    return { login, logout, newUser, currentUser, pers, verifyDNI, existDNI }
 })

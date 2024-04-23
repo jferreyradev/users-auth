@@ -1,5 +1,5 @@
 // fetch.js
-import { ref, watchEffect, toValue } from 'vue'
+import { ref, watchEffect } from 'vue'
 
 export function useFetch(url) {
     const data = ref(null)
@@ -11,13 +11,18 @@ export function useFetch(url) {
         data.value = null
         error.value = null
         isPending.value = true
-
-
-
-        fetch(toValue(url))
-            .then((res) => res.json())
-            .then((json) => (data.value = json))
-            .catch((err) => (error.value = err))
+        fetch(url())
+            .then((res) => {
+                res.json()
+            })
+            .then((_data) => {
+                data.value = _data
+            })
+            .catch((err) => {
+                console.log(err)
+                error.value = err
+            }
+            )
             .finally(() => (isPending.value = false))
     }
 

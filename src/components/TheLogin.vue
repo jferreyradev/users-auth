@@ -1,10 +1,10 @@
 <script setup>
 import { ref } from 'vue'
 import { useUserStore } from '@/stores/user.js'
-//import { useFetch } from '@/composables/useFetch.js'
-//import { useLiqStore } from '@/stores/liqStore'
+import { useFetch } from '@/composables/useFetch.js'
+import { useLiqStore } from '@/stores/liqStore'
 
-//const store = useLiqStore()
+const store = useLiqStore()
 
 const email = ref('')
 const password = ref('')
@@ -12,31 +12,22 @@ const dnilocal = ref('')
 
 const user = useUserStore()
 
-/*function useBoletasLiq(getId) {
-  if (store.dni !== '') {
-    console.log('fetch')
-    return useFetch(() => `${store.URL_API}/view/personaLista?Documento=${getId()}`)
-  }
-  return ''
+function useBoletasLiq(getId) {
+  return useFetch(() => `${store.URL_API}/view/personaLista?Documento=${getId()}`)
 }
 
 const { data, error, isPending } = useBoletasLiq(() => store.dni)
-*/
 
 function login() {
   user.login(email.value, password.value)
 }
 
 function handleClick() {
-  //store.dni = dnilocal.value
-  console.log('verificando en oracle ', dnilocal.value)
-  user.existDNI(dnilocal.value)
-  //user.verifyDNI(dnilocal.value)
+  store.dni = dnilocal.value
 }
 
 function reset() {
   dnilocal.value = ''
-  //store.dni = dnilocal.value
 }
 </script>
 
@@ -53,7 +44,9 @@ function reset() {
                 <v-btn color="primary" block class="mb-10" @click="handleClick"
                   >Verificar DNI</v-btn
                 >
+                <span v-if="isPending">Verificando</span>
               </div>
+
               <div v-else>
                 <h2>Bienvenido</h2>
                 <h3>{{ data[0].APELLIDO }} {{ data[0].NOMBRE }}</h3>

@@ -6,7 +6,7 @@ import { useFetch } from '@/composables/useFetch';
 
 export const useLiqStore = defineStore('liq', () => {
 
-    const URL_API = 'http://www.serverburru2.duckdns.org:3005/api'
+    const URL_API = 'http://www.serverconcepcion.duckdns.org:3007/api'
 
     const dni = ref('')
     const data = ref('')
