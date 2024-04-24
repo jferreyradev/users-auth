@@ -3,20 +3,25 @@ import { defineStore } from 'pinia'
 import { auth, db } from '../firebase'
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "firebase/auth";
 import { collection, query, where, getDocs } from "firebase/firestore";
+//import { doc, setDoc, addDoc } from "firebase/firestore";
+import * as rtdb from "firebase/database";
+
 import { useConn } from '@/composables/conn';
-import { useFetch } from '@/composables/fetch';
-
-
+import { useFetch } from '@/composables/useFetch.js';
 
 export const useUserStore = defineStore('user', () => {
     const currentUser = ref('')
-    const pers = ref('')
+    const dni = ref('')
+    const email = ref('')
     const nivel = ref(0)
     const conn = useConn()
+    const isInOra = ref(false)
+    const isInFire = ref(false)
 
     async function newUser(email, password) {
         try {
             await createUserWithEmailAndPassword(auth, email, password)
+            await writeUserData(currentUser.value.uid, dni.value, email.value)
         } catch (error) {
             switch (error.code) {
                 case 'auth/email-already-in-use':
@@ -32,6 +37,31 @@ export const useUserStore = defineStore('user', () => {
         }
         currentUser.value = auth.currentUser
         console.log(currentUser.value)
+    }
+
+    function writeUserData(userId, doc, email) {
+        const db = rtdb.getDatabase();
+        rtdb.set(rtdb.ref(db, 'users/' + userId), {
+            doc: doc,
+            email: email,
+            uid: userId,
+            nivel: 1
+        });
+    }
+
+    async function newUserStore(dni) {
+        console.log('por guardar en fire')
+
+        /*
+        // Add a new document with a generated id.
+        const docRef = await addDoc(collection(db, "usersliq"), {
+            doc: dni,
+            email: currentUser.value.email,
+            uid: currentUser.value.uid,
+            nivel: 1
+        });
+        console.log("Document written with ID: ", docRef.id);
+        */
     }
 
     async function login(email, password) {
@@ -70,7 +100,12 @@ export const useUserStore = defineStore('user', () => {
                     //console.log(doc.id, " => ", doc.data().doc);
                     console.log('dni ', doc.data().doc);
                     console.log('nivel ', doc.data().nivel);
+                    email.value = doc.data().email
                 });
+                return true
+            } else {
+                console.log('DNI no registrado')
+                return false
             }
 
         } catch (error) {
@@ -78,17 +113,6 @@ export const useUserStore = defineStore('user', () => {
         }
     }
 
-    async function existDNI(dni) {
-        console.log('verificando en ora ', dni)
 
-        try {
-            const res = await fetch(`http://www.serverburru2.duckdns.org:3005/api/view/personaLista?Documento=${dni}`)
-            const data = res.json()
-            console.log(data)
-        } catch (error) {
-            console.log(error);
-        }
-    }
-
-    return { login, logout, newUser, currentUser, pers, verifyDNI, existDNI }
+    return { login, logout, newUser, newUserStore, currentUser, verifyDNI, dni, email }
 })

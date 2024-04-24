@@ -16,18 +16,22 @@ function useBoletasLiq(getId) {
   return useFetch(() => `${store.URL_API}/view/personaLista?Documento=${getId()}`)
 }
 
-const { data, error, isPending } = useBoletasLiq(() => store.dni)
+const { data, error, isPending } = useBoletasLiq(() => user.dni)
+const isRegistred = ref()
 
 function login() {
   user.login(email.value, password.value)
 }
 
-function handleClick() {
-  store.dni = dnilocal.value
+async function handleClick() {
+  user.dni = dnilocal.value
+  isRegistred.value = await user.verifyDNI(user.dni)
+  console.log(isRegistred.value)
 }
 
 function reset() {
   dnilocal.value = ''
+  user.dni = ''
 }
 </script>
 
@@ -50,18 +54,23 @@ function reset() {
               <div v-else>
                 <h2>Bienvenido</h2>
                 <h3>{{ data[0].APELLIDO }} {{ data[0].NOMBRE }}</h3>
-                <v-text-field
-                  v-model="password"
-                  label="Contraseña"
-                  type="password"
-                  outlined
-                  required
-                  class="mt-5"
-                ></v-text-field>
-                <v-btn type="submit" color="primary" block>Iniciar sesión</v-btn>
-                <v-btn color="primary" block class="mt-2" @click="$emit('register')"
-                  >O regístrese</v-btn
-                >
+                <h4>DNI {{ user.dni }}</h4>
+                <div v-if="isRegistred">
+                  <v-text-field
+                    v-model="password"
+                    label="Contraseña"
+                    type="password"
+                    outlined
+                    required
+                    class="mt-5"
+                  ></v-text-field>
+                  <v-btn type="submit" color="primary" block>Iniciar sesión</v-btn>
+                </div>
+                <div v-else>
+                  <v-btn color="primary" block class="mt-2" @click="$emit('register')"
+                    >Regístrese</v-btn
+                  >
+                </div>
               </div>
               <v-btn v-if="data" color="primary" block class="mt-2" @click="reset">Cancelar</v-btn>
             </v-form>

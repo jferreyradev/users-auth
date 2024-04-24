@@ -17,12 +17,12 @@ const password2 = ref('')
 
 const user = useUserStore()
 
-function signUp() {
-  user.newUser(email.value, password.value)
+async function signUp() {
   console.log('Se va a registar el usuario')
+  await user.newUser(email.value, password.value)
+  //user.newUserStore()
+  console.log(user.currentUser)
 }
-
-console.log(user.currentUser)
 </script>
 
 <template>
