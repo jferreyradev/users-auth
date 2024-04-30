@@ -39,7 +39,7 @@ export const useUserStore = defineStore('user', () => {
         console.log(currentUser.value)
     }
 
-    function writeUserData(userId, doc, email) {
+    async function writeUserData(userId, doc, email) {
         const db = rtdb.getDatabase();
         rtdb.set(rtdb.ref(db, 'users/' + userId), {
             doc: doc,
@@ -47,21 +47,6 @@ export const useUserStore = defineStore('user', () => {
             uid: userId,
             nivel: 1
         });
-    }
-
-    async function newUserStore(dni) {
-        console.log('por guardar en fire')
-
-        /*
-        // Add a new document with a generated id.
-        const docRef = await addDoc(collection(db, "usersliq"), {
-            doc: dni,
-            email: currentUser.value.email,
-            uid: currentUser.value.uid,
-            nivel: 1
-        });
-        console.log("Document written with ID: ", docRef.id);
-        */
     }
 
     async function login(email, password) {
@@ -114,5 +99,5 @@ export const useUserStore = defineStore('user', () => {
     }
 
 
-    return { login, logout, newUser, newUserStore, currentUser, verifyDNI, dni, email }
+    return { login, logout, newUser, currentUser, verifyDNI, dni, email }
 })

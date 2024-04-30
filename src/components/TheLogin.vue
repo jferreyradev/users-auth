@@ -17,16 +17,17 @@ function useBoletasLiq(getId) {
 }
 
 const { data, error, isPending } = useBoletasLiq(() => user.dni)
-const isRegistred = ref()
+const isRegistred = ref(false)
+const isVerify = ref(false)
 
 function login() {
   user.login(email.value, password.value)
 }
 
-async function handleClick() {
+async function verify() {
   user.dni = dnilocal.value
   isRegistred.value = await user.verifyDNI(user.dni)
-  console.log(isRegistred.value)
+  isVerify.value = true
 }
 
 function reset() {
@@ -45,10 +46,11 @@ function reset() {
             <v-form @submit.prevent="login">
               <div v-if="!data">
                 <v-text-field v-model="dnilocal" label="DNI" outlined required></v-text-field>
-                <v-btn color="primary" block class="mb-10" @click="handleClick"
-                  >Verificar DNI</v-btn
-                >
+                <v-btn color="primary" block class="mb-10" @click="verify">Verificar DNI</v-btn>
                 <span v-if="isPending">Verificando</span>
+                <div v-else-if="isVerify && !isRegistred">
+                  <span>'Usuario No encontrado.'</span>
+                </div>
               </div>
 
               <div v-else>
